@@ -44,8 +44,8 @@ absent from both input files. Input changes do not require recompilation.
 
 ## Evidence and limitations
 
-Read `demo/PRESENTATION_GUIDE.md` for what to explain and screenshot. Actual demo
-outputs and the exact scenario inputs are saved under `demo/output/`. Previous
+Actual demo outputs and the exact scenario inputs are saved under
+`demo/output/`. Previous
 performance measurements, when included, are under `comparison/results/`.
 
 The demonstration verifies functional results. It does not prove privacy. The

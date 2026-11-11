@@ -10,7 +10,6 @@ oracle used to check the actual program's output.
 - `server.txt`: synthetic registered users, one identifier per line.
 - `client.txt`: synthetic client contacts, one identifier per line.
 - `config.json`: presentation title and the new contact used in the walkthrough.
-- `PRESENTATION_GUIDE.md`: what to say and which screens to capture.
 
 Use synthetic numbers for screenshots. Identifiers must match exactly. The
 program does not normalize phone numbers. Empty sets are not supported. Duplicate
