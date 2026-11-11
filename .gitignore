@@ -1,0 +1,16 @@
+build/
+__pycache__/
+vendor/libPSI/out/
+vendor/libPSI/thirdparty/log-*.txt
+/vendor/libPSI/thirdparty/sparsehash-c11/
+/vendor/libPSI/.upstream-git/
+/demo/output/
+/comparison/results/
+/output/
+/report_work/
+/tmp/
+/github-submission/
+/presentation_work/
+/presentation_pir_psi/
+/.chart-data-*/
+/.codex-finalizer/

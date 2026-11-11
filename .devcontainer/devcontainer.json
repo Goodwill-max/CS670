@@ -1,0 +1,9 @@
+{
+  "name": "PIR-PSI C++ research environment",
+  "build": { "dockerfile": "Dockerfile" },
+  "mounts": [
+    "source=cs670-crypto-dependencies,target=/workspaces/CS670/vendor/libPSI/out,type=volume",
+    "source=cs670-linux-build,target=/workspaces/CS670/build/linux,type=volume"
+  ],
+  "customizations": { "vscode": { "extensions": ["ms-vscode.cpptools", "ms-vscode.cmake-tools", "ms-python.python"] } }
+}

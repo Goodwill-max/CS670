@@ -1,0 +1,6 @@
+.vs/
+out/
+CMakeSettings.json
+thirdparty/sparsehash-c11/
+thirdparty/log-*.txt
+.upstream-git/

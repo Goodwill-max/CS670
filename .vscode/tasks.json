@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {"label":"Configure", "type":"process", "command":"cmake", "args":["-S",".","-B","build/linux","-DCMAKE_BUILD_TYPE=Release"], "problemMatcher":[]},
+    {"label":"Build", "type":"process", "command":"cmake", "args":["--build","build/linux","--target","contact_discovery","--parallel","2"], "dependsOn":"Configure", "group":{"kind":"build","isDefault":true}, "problemMatcher":["$gcc"]},
+    {"label":"Run contact discovery", "type":"process", "command":"python3", "args":["scripts/run_demo.py"], "dependsOn":"Build", "problemMatcher":[]},
+    {"label":"Test protocol", "type":"process", "command":"ctest", "args":["--test-dir","build/linux","--output-on-failure"], "dependsOn":"Build", "problemMatcher":[]}
+  ]
+}
+
