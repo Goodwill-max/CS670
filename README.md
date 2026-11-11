@@ -1,14 +1,18 @@
 # PIR-PSI private contact discovery
 
-C++ research project implementing the **two-server, unbinned, single-entry-block**
-construction in Sections 2.3 and 3.1-3.3 of *PIR-PSI: Scaling Private Contact
-Discovery* (Demmler, Rindal, Rosulek, Trieu, PETS 2018).
+This CS670 project implements private contact discovery in C++. A client
+finds which of its contact identifiers appear in a registered-user set held
+by two servers. The application builds a cuckoo table, queries candidate
+locations using private information retrieval (PIR), and compares masked
+values using private set intersection (PSI).
 
-The cryptographic backend is the authors' [libPSI](https://github.com/osu-crypto/libPSI),
-vendored at commit `1159df1fecad06570ec384d64ab0724d05b6905b` with its license.
-`src/main.cpp` is a new application driver. It does **not** call the upstream
-`DrrnPsiClient`/`DrrnPsiServer` benchmarking path, which has hardcoded masks and
-tests explicitly documenting incorrect intersections.
+`src/main.cpp` implements the client and both server roles. The demo scripts
+launch those roles on synthetic inputs and check the returned matches. The
+separate `comparison/` project measures runtime and communication against
+direct KKRT PSI.
+
+The cryptographic backend uses [libPSI](https://github.com/osu-crypto/libPSI)
+and libOTe. See [DEPENDENCIES.md](DEPENDENCIES.md) for versions and build details.
 
 ## Open and run in VS Code on Windows
 
@@ -85,14 +89,14 @@ baseline, using `--compare`, and running the benchmark.
 
 ## Protocol and source map
 
-| Paper component | Implementation |
+| Component | Implementation |
 | --- | --- |
 | 128-bit item encoding | domain-separated RandomOracle digest in `encode` |
-| Three-choice cuckoo table, Sec. 3.2 | `cuckoo`: augmenting paths, public fresh salt, identical replicas |
-| BGI distributed point function, Sec. 2.3 | upstream `BgiPirClient::keyGen`, `BgiPirServer::fullDomain` |
-| Designated-output PIR, Sec. 3.1 | server1 sends its masked response directly to server0 |
-| Hide cuckoo location, Sec. 3.3 | fresh three-mask vector per contact; server1 secretly shuffles it |
-| Secure PSI, reference [30] | upstream `KkrtPsiSender` and `KkrtPsiReceiver`, real KKRT OT extension and base OTs |
+| Three-choice cuckoo table | `cuckoo` uses augmenting paths and a fresh public salt to build identical replicas |
+| BGI distributed point function | `BgiPirClient::keyGen` and `BgiPirServer::fullDomain` generate and evaluate query shares |
+| Designated-output PIR | Server 1 sends its masked response directly to Server 0 |
+| Hide cuckoo location | Server 1 shuffles three fresh masks per contact |
+| Secure PSI | `KkrtPsiSender` and `KkrtPsiReceiver` run KKRT with OT extension and base OTs |
 | Client output | matched masked-input indices map to original contacts; deduplicate |
 
 Each query produces shares `v0 XOR v1 = CT[h_j(x)]`. Server1 sends
@@ -105,20 +109,16 @@ OS-seeded PRNGs on every invocation.
 
 ## Scope and security assumptions
 
-This is a research implementation, **not an audited production system**. Its
-intended model is semi-honest parties and two non-colluding servers. Running both
-on one computer is a functional demo, not independent operation. Each server
-holds the complete database. Contact and database sizes are public. Colluding
-servers can reconstruct query locations. PSI does not stop clients from testing
-guessed phone numbers; deployment needs a separate authorization policy.
+The intended model assumes semi-honest parties and two non-colluding servers.
+Each server holds the complete database, and contact and database sizes are
+public. Colluding servers can reconstruct query locations. A deployment would
+need an authorization policy to limit repeated queries for guessed numbers.
 
-This project implements the core construction rather than the paper's entire
-optimized prototype. Query binning (Sec. 3.4), larger PIR blocks (Sec. 3.5),
-Appendix A's optimized global permutation, AES batch tuning, persistent sessions,
-associated-data retrieval, and 3/4-server variants are not implemented. The table
-uses conservative power-of-two sizing of at least 2N rather than the paper's
-experimental tight sizing formula. Construction failure aborts. Server work is
-O(client-size * database-size); do not expect the published million-user timings.
+The application uses an unbinned lookup for each candidate location. The
+cuckoo table has a power-of-two size with at least twice as many slots as
+registered identifiers. Construction aborts if an item cannot be placed.
+Each server scans its table for every PIR query, so query work grows with
+the product of client and database sizes.
 
 The driver binds to localhost and supplies no transport authentication/TLS or
 malicious-message hardening. It must not be exposed to the internet. No claim of
@@ -136,6 +136,5 @@ Validated on 2026-11-06 in the Ubuntu 22.04 VS Code development container:
 CMake configuration and the C++ application build succeeded; both CTest suites
 passed (24 end-to-end protocol runs plus the primitive checks). The sample
 `python3 scripts/run_demo.py` command returned exactly `+919000000002` and
-`+919000000004`. These checks establish tested functionality, not a security audit
-or the paper's published performance claims.
+`+919000000004`. These checks verify functional correctness for the tested inputs.
 
